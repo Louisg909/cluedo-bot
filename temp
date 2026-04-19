@@ -1,0 +1,66 @@
+
+I have edited some stuff, and for simplicity I will remove the game engine layer as it was unnessisary complexity and overelapped too much with the top-level running scirpt.
+I have pretty much made this CluedoBot which will have all that functionality in the top level script (a big reason is because this bot is importing from the others so want to keep it on the layer above what it is importing for simplicity)
+Here is the code:
+```
+class CluedoBot:
+    def __init__(self,no_players, users_hand:set, public_hand:set=None):
+        self.state = GameState(no_players, user_hand, public_hand)
+
+
+    def record_guess(self, guesser, guess_items:set, responder=False):
+        if not responder:
+            # go through all holders except the first three (user, public, and hidden) and set to NO for all the cards - EXCEPT the guesser!!!
+
+            verified_holders =  set(range(2, n+1)) # all minus private (0), and holder (1)
+            verified_holders.remove(guesser) # removes the guesser from the set
+        else:
+            if guesser < responder:
+                verified_holders = set(range(G+1, r))
+            else:
+                verified_holders = set(range(G + 1, n + 1)) | set(range(2, r))
+
+        self.state.set_all_nos(verified_holders, guess_items)
+```
+
+And I had some changes to the state code too
+
+```
+    def __init__(self, n_agents: int, user_hand:set, public_hand:set=None):
+        if n_agents < 1:
+            raise ValueError("n_agents must be at least 1")
+
+        self.n_agents = n_agents
+
+        self.n_holders = n_agents + 2
+
+        self.agent_capacity = (self.N_ITEMS - 3) // n_agents
+
+        self.ownership = [
+            [0.5 for _ in range(self.n_holders)]
+            for _ in range(self.N_ITEMS)
+        ]
+
+        self.constraint_set = set()
+        self.initialise_user_hand(*user_hand)
+
+        if public_hand != None:
+            self.initialise_public_hand(*public_hand)
+
+
+    def set_all_nos(self, holder_indicies:Set, item_indecies):
+        for holder in holder_indicies:
+            for item in item_indicies:
+                self.set_known_no(item, holder) # should error if they are already a yes
+
+    def initialise_user_hand(self, *item_indices: int) -> None:
+        for item_index in item_indices:
+            self.set_holder_row_yes_and_others_no(item_index, 2) # index 2 is the user holder
+
+
+    def initialise_public_hand(self, *item_indices: int) -> None:
+        for item_index in item_indices:
+            self.set_holder_row_yes_and_others_no(item_index, 1) # index 1 is the public holder
+```
+
+Please give me some feedback.
