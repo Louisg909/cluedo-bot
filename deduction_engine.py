@@ -1,3 +1,5 @@
+__all__ = ['deduct']
+
 def deduct(state):
     while True:
         changed = False # change all rows bellow as an or statement? or(apply_row(), ())?
