@@ -1,7 +1,5 @@
 
 
-
-
 class turn_tracker:
     def __init__(self):
         pass
@@ -17,9 +15,6 @@ class GameEngine:
         # return list - 1 at shower_index, and 0 inbetween guesser_index and None everywhere else? if shower_index = None then everyone except the guesser is 0
         if shower_index = None:
             return [0 if n != guesser_index else None for n in range(self.no_agenets)]
-
-
-
 
 
 

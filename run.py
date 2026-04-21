@@ -40,30 +40,51 @@ from .state import GameState
 
 
 class CluedoBot:
-    def __init__(self,no_players, users_hand:set, public_hand:set=None):
+    def __init__(self, no_players:int, user_hand:set, public_hand:set|None):
         self.state = GameState(no_players, user_hand, public_hand)
 
 
     def record_guess(self, guesser, guess_items:set, responder:int=None):
-        if responder == None:
-            # go through all holders except the first three (user, public, and hidden) and set to NO for all the cards - EXCEPT the guesser!!!
-
-            verified_holders =  set(range(2, n+1)) # all minus private (0), and holder (1)
-            verified_holders.remove(guesser) # removes the guesser from the set
+        if responder is None:
+            verified_holders = set(range(2, self.state.n_holders))
+            verified_holders.remove(guesser)
         else:
-            if guesser < responder:
-                verified_holders = set(range(G+1, r))
-            else:
-                verified_holders = set(range(G + 1, n + 1)) | set(range(2, r))
+            if responder == guesser:
+                raise ValueError("responder cannot be the same as guesser")
 
-            self.state.add_constraint(responder, *guess_items) # add the constraints on the responder
-
-        self.state.set_all_nos(verified_holders, guess_items)
-
-
-
+            verified_holders = self._holders_between(guesser, responder)
+            self.state.add_constraint(responder, *guess_items)
 
         # run logical deductions ?
+
+        return None
+
+
+    def _holders_between(self, start: int, end: int) -> set:
+        """
+        Return the set of agent-holder indices strictly between start and end in forward circular order.
+
+        Holder convention:
+        - 0 = hidden
+        - 1 = public
+        - 2.. = player holders
+        """
+        holders = []
+        current = start
+
+        while True:
+            current += 1
+            if current >= self.state.n_holders:
+                current = 2
+
+            if current == end:
+                break
+            
+            holders.append(current)
+
+        return set(holders)
+
+
 
 
 
